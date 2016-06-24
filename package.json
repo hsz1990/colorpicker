@@ -1,0 +1,17 @@
+{
+  "name": "colorpicker",
+  "version": "1.0.0",
+  "description": "",
+  "main": ".conf.js",
+  "scripts": {
+    "init": "gulp init"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "gulp": "^3.9.1",
+    "gulp-filter": "^4.0.0",
+    "minimist": "^1.2.0",
+    "node.extend": "^1.1.5"
+  }
+}

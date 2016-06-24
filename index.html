@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>ColorPicker</title>
+	<style type="text/css">
+		body{
+			font-size: 20px;
+			line-height: 36px;
+			font-family: 'mirosoft yahei';
+		}
+		.w1200{
+			width: 1200px;
+			background-color: rgb(240, 239, 239);
+		}
+		img{
+			display: table-cell;
+		}
+		.bcenter{
+			display: block;
+			margin-left: auto;
+			margin-right: auto;
+		}
+		.inlines{
+			text-align: right;
+		}
+		.inlines>div{
+			display: inline-block;
+			height: 40px;
+			line-height: 40px;
+			min-width: 5em;
+			margin-right: 1em;
+		}
+		.colors>i{
+			display: inline-block;
+			width: .8em;
+			height: .8em;
+			margin-right: .5em;
+		}
+		.colors>i:hover{
+			border:1px solid red;
+		}
+		.backs:hover,.fonts:hover,.borders:hover{
+			cursor: pointer;
+		}
+		.active{
+			background-color: #ccc;
+		}
+		.hide{
+			display: none !important;
+		}
+		body>menu,
+		.bigPic{
+			position: fixed;
+			z-index: 1000;
+		}
+		body>menu,
+		body>menu ul,
+		body>menu li{
+			margin:0;
+			padding: 0;
+			list-style: none;
+		}
+		body>menu li{
+			padding: 0 2em;
+			border:1px solid rgb(232, 234, 239);
+		}
+		body>menu li:hover{
+			background-color: #ff5600;
+		}
+	</style>
+</head>
+<body>
+	<div class="bcenter w1200" id="infoContainer">
+		<div class="backs active"><span>背景色:</span><span class="colors"></span></div>
+		<div class="fonts"><span>字体色:</span><span class="colors"></span></div>
+		<div class="borders"><span>边框色:</span><span class="colors"></span></div>
+	</div>
+	<div class="bcenter inlines w1200">
+		<div class="currentColor">&nbsp;</div>
+		<div class="changePic">下一张(共<var id="picNum">1</var>张)</div>
+		<div><a href="javascript:saveCss()" class="save"></a></div>
+	</div>
+	<canvas class="bcenter" id="ui"><canvas>
+</body>
+	<script type="text/javascript" src='.conf.js'></script>
+	<script type="text/javascript">
+		var _cssObj={};
+		+function(){
+			var $=function(cls,first){
+				var scope=this instanceof HTMLElement?this:document;
+				if(/^\#[\w-]+$/.test(cls)){
+					return scope.getElementById(cls.replace(/^\#/,""));
+				}else if(/^\.[\w-]+$/.test(cls)){
+					var res=scope.getElementsByClassName(cls.replace(/^\./,""));
+					if(first){return res[0];}
+					return res;
+				}else if(/^[a-zA-Z]+$/g.test(cls)){
+					var res=scope.getElementsByTagName(cls);
+					if(first){return res[0];}
+					return res;
+				}else{
+					var res=document.querySelectorAll(cls);
+					if(first){return res[0];}
+					return res;
+				}			
+			},forEach=Array.prototype.forEach,concat=Array.prototype.concat,efn=function(){},currImg;
+			forEach.bind($(".colors"))(function(el){el.addEventListener('contextmenu',contextmenuOn);})
+			document.body.addEventListener("click",contextmenuOff);
+			document.body.addEventListener("contextmenu",contextmenuOff);
+			document.body.addEventListener("keyup",bigPicOff)
+			forEach.bind($("#infoContainer>div"))(function(el){
+				el.addEventListener("click",function(){
+					var active=$("#infoContainer>.active",true);
+						if(active){active.classList.remove("active")}
+					this.classList.add("active");
+				})
+			})
+			var marking=false;
+			$("#ui").addEventListener("mousedown",function(e){
+				marking={x:e.offsetX,y:e.offsetY};
+			});
+			$("#ui").addEventListener("mousemove",function(e){
+				if(e.ctrlKey && !marking){
+					var big=$(".bigPic",true)||(function(){
+							var c=document.createElement("canvas");
+							c.width=150,c.height=150;
+							c.classList.add("bigPic");
+							document.body.appendChild(c);
+							return c;
+						})();
+						big.classList.remove("hide"),
+						big.style.top=e.clientY+10+"px",
+						big.style.left=e.clientX+"px";
+					var bigCtx=big.getContext('2d');
+					bigCtx.drawImage(currImg,e.offsetX-35,e.offsetY-35,70,70,0,0,150,150);
+					bigCtx.beginPath();
+					bigCtx.strokeStyle="#FD5E5E";
+					bigCtx.rect(74,74,2,2);
+					bigCtx.stroke();
+				}
+			});
+			$("#ui").addEventListener("mouseup",function(e){
+				var ctx=this.getContext("2d"),
+					i=document.createElement("i"),
+					act=$("#infoContainer>.active>.colors",true),
+					picker=ctx.getImageData(e.offsetX,e.offsetY,1,1).data,
+					color="rgba("+picker[0]+","+picker[1]+","+picker[2]+","+picker[3]+")",
+					type=act.classList.contains("backs")?"background":act.classList.contains("fonts")?"font":"border",
+					hex=("#"+picker[0].toString(16)+picker[1].toString(16)+picker[2].toString(16)).toUpperCase();
+					$(".currentColor",true).innerText="当前颜色:"+hex;
+					i.style["background-color"]=hex;
+					act.appendChild(i);
+					_cssObj[type]=_cssObj[type]||{};
+					_cssObj[type].push(hex);
+					ctx.beginPath();
+					ctx.strokeStyle="#FD5E5E";
+					ctx.moveTo(marking.x,marking.y);
+					ctx.lineTo(e.offsetX,e.offsetY);
+					ctx.stroke();
+					ctx.font="15px 'mirosoft yahei'";
+					ctx.strokeStyle="#22C8BA";
+					ctx.strokeText(hex,e.offsetX,e.offsetY);
+					marking=false;
+			});
+			$("#picNum").innerText=conf.picNum;
+			loadImage(0);
+			function contextmenuOff(e){
+				var menu=$("menu",true);
+				if(menu){menu.classList.add("hide")}
+				//if(menu){document.body.removeChild(menu);}
+			}
+			function contextmenuOn(e){
+				if(e.target.tagName.toUpperCase()=="I"){
+					if(e.ctrlKey){return true;}
+					var menu=$("menu",true)||(function(){
+							var m=document.createElement("menu");
+							m.innerHTML='<ul><li class="del">删除</li><li class="mod">修改</li></ul>';
+							document.body.appendChild(m);
+							return m;
+						})();
+						menu.classList.remove("hide");
+						menu.style.top=e.clientY+10+"px",
+						menu.style.left=e.clientX+"px";
+					e.cancelBubble=true;
+					e.preventDefault();
+					e.stopPropagation();
+					return false;
+				}
+			}
+			function bigPicOff(){
+				var bigPic=$(".bigPic",true);
+				if(bigPic){bigPic.classList.add("hide")}
+			}
+			function loadImage(index,cb=efn){
+				if(index>conf.picNum-1){cb("not so much",null);}
+				var img=new Image();
+				img.onload=function(){
+					var ui=$("#ui"),ctx=ui.getContext("2d");
+					ui.setAttribute("width",img.width);
+					ui.setAttribute("height",img.height);
+					ctx.drawImage(img,0,0);
+					currImg=img;
+					cb(null,img);
+				}
+				img.src=conf.picPath[index];
+			}
+		}()
+		function saveCss(){
+			
+		}
+	</script>
+</html>
