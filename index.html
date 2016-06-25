@@ -49,6 +49,9 @@
 		.hide{
 			display: none !important;
 		}
+		.save{
+			text-decoration: none;
+		}
 		body>menu,
 		.bigPic{
 			position: fixed;
@@ -79,11 +82,12 @@
 	<div class="bcenter inlines w1200">
 		<div class="currentColor">&nbsp;</div>
 		<div class="changePic">下一张(共<var id="picNum">1</var>张)</div>
-		<div><a href="javascript:saveCss()" class="save"></a></div>
+		<div><a href="javascript:saveCss1()" class="save">保存</a></div>
 	</div>
 	<canvas class="bcenter" id="ui"><canvas>
 </body>
 	<script type="text/javascript" src='.conf.js'></script>
+	<script type="text/javascript" src="colors.js"></script>
 	<script type="text/javascript">
 		var _cssObj={};
 		+function(){
@@ -139,19 +143,35 @@
 					bigCtx.rect(74,74,2,2);
 					bigCtx.stroke();
 				}
+				if(!marking){
+					var ctx=this.getContext("2d"),
+						picker=ctx.getImageData(e.offsetX,e.offsetY,1,1).data,
+						hex="#",
+						cc=$(".currentColor",true);
+						picker.slice(0,3).forEach(function(v){
+							var t=("0"+v.toString(16));
+							hex+=t.substring(t.length-2);
+						})
+					cc.innerText="当前颜色:"+hex;
+					cc.style["background-color"]=hex;
+				}
 			});
 			$("#ui").addEventListener("mouseup",function(e){
 				var ctx=this.getContext("2d"),
 					i=document.createElement("i"),
 					act=$("#infoContainer>.active>.colors",true),
-					picker=ctx.getImageData(e.offsetX,e.offsetY,1,1).data,
+					actc=$("#infoContainer>.active",true),
+					picker=ctx.getImageData(marking.x,marking.y,1,1).data,
 					color="rgba("+picker[0]+","+picker[1]+","+picker[2]+","+picker[3]+")",
-					type=act.classList.contains("backs")?"background":act.classList.contains("fonts")?"font":"border",
-					hex=("#"+picker[0].toString(16)+picker[1].toString(16)+picker[2].toString(16)).toUpperCase();
-					$(".currentColor",true).innerText="当前颜色:"+hex;
+					type=actc.classList.contains("backs")?"background-color":actc.classList.contains("fonts")?"color":"border",
+					hex="#";
+					picker.slice(0,3).forEach(function(v){
+						var t=("0"+v.toString(16));
+						hex+=t.substring(t.length-2);
+					})
 					i.style["background-color"]=hex;
 					act.appendChild(i);
-					_cssObj[type]=_cssObj[type]||{};
+					_cssObj[type]=_cssObj[type]||[];
 					_cssObj[type].push(hex);
 					ctx.beginPath();
 					ctx.strokeStyle="#FD5E5E";
@@ -192,7 +212,7 @@
 				var bigPic=$(".bigPic",true);
 				if(bigPic){bigPic.classList.add("hide")}
 			}
-			function loadImage(index,cb=efn){
+			function loadImage(index,cb){
 				if(index>conf.picNum-1){cb("not so much",null);}
 				var img=new Image();
 				img.onload=function(){
@@ -201,13 +221,20 @@
 					ui.setAttribute("height",img.height);
 					ctx.drawImage(img,0,0);
 					currImg=img;
-					cb(null,img);
+					cb||efn(null,img);
 				}
 				img.src=conf.picPath[index];
 			}
 		}()
-		function saveCss(){
-			
+		function saveCss1(){
+			var css="",img=$("#ui").toDataURL();	
+			for(var cssName in _cssObj){
+				var cls="color"==cssName?"c":"border"==cssName?"b":"bc";
+				_cssObj[cssName].forEach(function(v){
+					css+="."+cls+"_"+v.replace("#","")+"{\n\t"+cssName+":"+(cls=="border"?"1px solid "+v:v)+";\n}\n"
+				});
+			}	
+			console.log(css)
 		}
 	</script>
 </html>
