@@ -120,6 +120,10 @@
 					this.classList.add("active");
 				})
 			})
+			$(".changePic",true).addEventListener("click",function(){
+				console.log($("#ui").getAttribute("data-index"))
+				loadImage(+$("#ui").getAttribute("data-index")+1)
+			})
 			var marking=false;
 			$("#ui").addEventListener("mousedown",function(e){
 				marking={x:e.offsetX,y:e.offsetY};
@@ -152,6 +156,7 @@
 							var t=("0"+v.toString(16));
 							hex+=t.substring(t.length-2);
 						})
+						hex=hex.toUpperCase();
 					cc.innerText="当前颜色:"+hex;
 					cc.style["background-color"]=hex;
 				}
@@ -169,6 +174,7 @@
 						var t=("0"+v.toString(16));
 						hex+=t.substring(t.length-2);
 					})
+					hex=hex.toUpperCase();
 					i.style["background-color"]=hex;
 					act.appendChild(i);
 					_cssObj[type]=_cssObj[type]||[];
@@ -212,13 +218,16 @@
 				var bigPic=$(".bigPic",true);
 				if(bigPic){bigPic.classList.add("hide")}
 			}
-			function loadImage(index,cb){
-				if(index>conf.picNum-1){cb("not so much",null);}
+			function loadImage(index,cb){console.log(index)
+				if(index>conf.picNum-1){cb||efn("not so much",null);return;}
 				var img=new Image();
 				img.onload=function(){
 					var ui=$("#ui"),ctx=ui.getContext("2d");
 					ui.setAttribute("width",img.width);
 					ui.setAttribute("height",img.height);
+					ui.setAttribute("data-index",index);
+					ctx.fillStyle="#fff";
+					ctx.fillRect(0,0,img.width,img.height)
 					ctx.drawImage(img,0,0);
 					currImg=img;
 					cb||efn(null,img);
