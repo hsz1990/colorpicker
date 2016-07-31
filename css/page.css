@@ -1,0 +1,148 @@
+body {
+    font-size: 20px;
+    line-height: 36px;
+    font-family: 'mirosoft yahei',"宋体","Arial";
+}
+
+.w1200 {
+    background-color: rgb(240, 239, 239);
+}
+
+@media screen and(min-width: 1200px) {
+    .w1200 {
+        width: 1200px;
+    }
+}
+
+img {
+    display: table-cell;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.bcenter {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.inlines {
+    text-align: right;
+}
+
+.inlines>div {
+    display: inline-block;
+    height: 40px;
+    line-height: 40px;
+    min-width: 5em;
+    margin-right: 1em;
+}
+
+.colors>i {
+    display: inline-block;
+    width: .8em;
+    height: .8em;
+    margin-right: .5em;
+}
+
+.colors>i:hover {
+    border: 1px solid red;
+}
+
+.backs:hover, .fonts:hover, .borders:hover {
+    cursor: pointer;
+}
+
+.active {
+    background-color: #ccc;
+}
+
+.hide {
+    display: none !important;
+}
+
+.save {
+    text-decoration: none;
+}
+
+body>menu, .bigPic {
+    position: fixed;
+    z-index: 1000;
+}
+
+body>menu, body>menu ul, body>menu li {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+body>menu li {
+    padding: 0 2em;
+    border: 1px solid rgb(232, 234, 239);
+}
+
+body>menu li:hover {
+    background-color: #ff5600;
+}
+
+.pop {
+    position: fixed;
+    background-color: rgb(232, 180, 180);
+    width: 80%;
+    height: 80%;
+    top: 10%;
+    left: 10%;
+    overflow: auto;
+    font-size: 14px;
+}
+
+.pop .close {
+    position: absolute;
+    right: 1em;
+    color: #fff;
+    font-size: 2em;
+    font-style: normal;
+}
+
+.pop .close:hover {
+    cursor: pointer;
+}
+
+.pop-alert .code {
+    padding-left: 1em;
+}
+
+.pop-drag .drag {
+    -moz-user-select: none;
+    /*火狐*/
+    -webkit-user-select: none;
+    /*webkit浏览器*/
+    -ms-user-select: none;
+    /*IE10*/
+    user-select: none;
+}
+
+.pop-drag .drag:hover {
+    cursor: pointer;
+}
+
+.pop-drag .imgList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    padding-left: .5em;
+}
+
+.pop-drag .imgList:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}
+
+.pop-drag .imgList li {
+    margin: 1em .5em;
+    float: left;
+    width: 20%;
+}
